@@ -403,6 +403,19 @@
     });
   }
 
+  // --- Copy Phone Number to Clipboard Widget ---
+  const copyPhoneBtn = document.getElementById('btn-copy-phone');
+  if (copyPhoneBtn) {
+    copyPhoneBtn.addEventListener('click', () => {
+      const phone = '+919026399211';
+      navigator.clipboard.writeText(phone).then(() => {
+        showToast('✔ Copied +91 9026399211 to clipboard!');
+      }).catch(() => {
+        showToast('Direct phone: +91 9026399211');
+      });
+    });
+  }
+
   // --- Contact Form Submission ---
   const contactForm = document.getElementById('contact-form');
   if (contactForm) {

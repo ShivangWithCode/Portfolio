@@ -79,7 +79,9 @@
 
     contact: () => `
 <div class="terminal-line"><span class="cmd-highlight">CONTACT CHANNELS:</span></div>
-<div class="terminal-line">  Email:    <span class="cmd-prefix">pandeyshivang987@gmail.com</span></div>
+<div class="terminal-line">  Phone:    <a href="tel:+919026399211" class="cmd-prefix">+91 9026399211</a></div>
+<div class="terminal-line">  WhatsApp: <a href="https://wa.me/919026399211" target="_blank" class="cmd-prefix">wa.me/919026399211</a></div>
+<div class="terminal-line">  Email:    <a href="mailto:pandeyshivang987@gmail.com" class="cmd-prefix">pandeyshivang987@gmail.com</a></div>
 <div class="terminal-line">  Role:     Full-Stack Web Developer & Python Backend Specialist</div>
 <div class="terminal-line">  Location: India (IST / UTC+5:30)</div>
 <div class="terminal-line">  Status:   Available for freelance projects, custom web apps & contract work</div>
@@ -87,7 +89,8 @@
 
     socials: () => `
 <div class="terminal-line"><span class="cmd-highlight">CONNECT ONLINE:</span></div>
-<div class="terminal-line">  GitHub:   <a href="https://github.com" target="_blank" class="cmd-prefix">github.com/shivang-pandey</a></div>
+<div class="terminal-line">  WhatsApp: <a href="https://wa.me/919026399211" target="_blank" class="cmd-prefix">+91 9026399211 (Direct Chat)</a></div>
+<div class="terminal-line">  GitHub:   <a href="https://github.com/ShivangWithCode/Portfolio" target="_blank" class="cmd-prefix">github.com/ShivangWithCode/Portfolio</a></div>
 <div class="terminal-line">  LinkedIn: <a href="https://linkedin.com" target="_blank" class="cmd-prefix">linkedin.com/in/shivang-pandey</a></div>
 <div class="terminal-line">  Email:    <a href="mailto:pandeyshivang987@gmail.com" class="cmd-prefix">pandeyshivang987@gmail.com</a></div>
 `,
