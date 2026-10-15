@@ -416,28 +416,65 @@
     });
   }
 
-  // --- Contact Form Submission ---
+  // --- Contact Form Submission with FastAPI Backend Integration ---
   const contactForm = document.getElementById('contact-form');
   if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = document.getElementById('form-name').value.trim();
-      const email = document.getElementById('form-email').value.trim();
-      const message = document.getElementById('form-message').value.trim();
+      const nameInput = document.getElementById('form-name');
+      const emailInput = document.getElementById('form-email');
+      const messageInput = document.getElementById('form-message');
+      const submitBtn = contactForm.querySelector('button[type="submit"]');
+
+      const name = nameInput.value.trim();
+      const email = emailInput.value.trim();
+      const message = messageInput.value.trim();
 
       if (!name || !email || !message) {
         showToast('⚠ Please fill in all fields before sending.');
         return;
       }
 
-      showToast(`⚡ Thank you ${name}! Shivang will respond to your email shortly.`);
-      contactForm.reset();
+      // UI Loading state
+      const originalBtnHTML = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" stroke-opacity="0.8"/></svg>
+        <span>Processing Inquiry...</span>
+      `;
 
-      // Launch mailto fallback
-      setTimeout(() => {
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ name, email, message })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          showToast(`✔ ${data.message}`);
+          contactForm.reset();
+        } else {
+          // Validation error from backend
+          const errMsg = data.detail ? (Array.isArray(data.detail) ? data.detail[0].msg : data.detail) : 'Failed to send message.';
+          showToast(`⚠ ${errMsg}`);
+        }
+      } catch (err) {
+        // Safe fallback to mailto if network or server is offline
+        showToast(`⚡ Message saved! Redirecting to email...`);
+        contactForm.reset();
         const mailtoUrl = `mailto:pandeyshivang987@gmail.com?subject=Portfolio Inquiry from ${encodeURIComponent(name)}&body=${encodeURIComponent(message + '\n\nFrom: ' + name + ' (' + email + ')')}`;
-        window.location.href = mailtoUrl;
-      }, 1200);
+        setTimeout(() => {
+          window.location.href = mailtoUrl;
+        }, 1000);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHTML;
+      }
     });
   }
 

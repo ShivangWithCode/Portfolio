@@ -30,10 +30,10 @@
     constructor() {
       this.x = Math.random() * width;
       this.y = Math.random() * height;
-      this.size = Math.random() * 2 + 1;
-      this.speedX = (Math.random() - 0.5) * 0.75;
-      this.speedY = (Math.random() - 0.5) * 0.75;
-      this.baseAlpha = Math.random() * 0.45 + 0.2;
+      this.size = Math.random() * 1.4 + 0.6;
+      this.speedX = (Math.random() - 0.5) * 0.35;
+      this.speedY = (Math.random() - 0.5) * 0.35;
+      this.baseAlpha = Math.random() * 0.25 + 0.08;
     }
 
     update() {
@@ -91,14 +91,14 @@
 
   function initParticles() {
     particles = [];
-    const density = Math.min(Math.floor((width * height) / 14000), 75);
+    const density = Math.min(Math.floor((width * height) / 28000), 35);
     for (let i = 0; i < density; i++) {
       particles.push(new Particle());
     }
   }
 
   function connectParticles(accentRgb) {
-    const maxDistance = 120;
+    const maxDistance = 110;
     const len = particles.length;
 
     for (let a = 0; a < len; a++) {
@@ -108,10 +108,10 @@
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         if (dist < maxDistance) {
-          const opacity = (1 - dist / maxDistance) * 0.22;
+          const opacity = (1 - dist / maxDistance) * 0.08;
           ctx.beginPath();
           ctx.strokeStyle = `rgba(${accentRgb}, ${opacity})`;
-          ctx.lineWidth = 0.8;
+          ctx.lineWidth = 0.6;
           ctx.moveTo(particles[a].x, particles[a].y);
           ctx.lineTo(particles[b].x, particles[b].y);
           ctx.stroke();

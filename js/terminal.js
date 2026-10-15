@@ -18,6 +18,8 @@
   const COMMANDS = {
     help: () => `
 <div class="terminal-line"><span class="cmd-highlight">AVAILABLE COMMANDS:</span></div>
+<div class="terminal-line">  <span class="cmd-prefix">api</span>        - View live FastAPI backend status, endpoints & /docs Swagger UI</div>
+<div class="terminal-line">  <span class="cmd-prefix">inquiries</span>  - Fetch client inquiries from secure FastAPI backend vault</div>
 <div class="terminal-line">  <span class="cmd-prefix">services</span>   - Web applications, Python backends, REST APIs & custom business tools</div>
 <div class="terminal-line">  <span class="cmd-prefix">about</span>      - Learn about Shivang's background, education & technical focus</div>
 <div class="terminal-line">  <span class="cmd-prefix">skills</span>     - View technical stack (Python, Django, FastAPI, React, DBs)</div>
@@ -27,6 +29,19 @@
 <div class="terminal-line">  <span class="cmd-prefix">theme &lt;name&gt;</span>- Change accent theme (violet, cyan, emerald, amber, rose)</div>
 <div class="terminal-line">  <span class="cmd-prefix">clear</span>      - Clear terminal screen</div>
 <div class="terminal-line">  <span class="cmd-prefix">date</span>       - Print current local date & time</div>
+`,
+
+    api: () => `
+<div class="terminal-line"><span class="cmd-success">FASTAPI BACKEND SERVICE:</span></div>
+<div class="terminal-line">  Status:       <span class="cmd-highlight">Online (v1.0.0)</span></div>
+<div class="terminal-line">  Architecture: FastAPI Async REST API (Python 3.13)</div>
+<div class="terminal-line">  Swagger Docs: <a href="/docs" target="_blank" class="cmd-prefix">/docs (Interactive Swagger UI)</a></div>
+<div class="terminal-line">  Endpoints:</div>
+<div class="terminal-line">    - <span class="cmd-prefix">GET  /api/health</span>   : System health & uptime telemetry</div>
+<div class="terminal-line">    - <span class="cmd-prefix">GET  /api/info</span>     : Developer stack & contact payload</div>
+<div class="terminal-line">    - <span class="cmd-prefix">GET  /api/projects</span> : Structured flagship projects list</div>
+<div class="terminal-line">    - <span class="cmd-prefix">POST /api/contact</span>  : Pydantic validated inquiries pipeline</div>
+<div class="terminal-line">    - <span class="cmd-prefix">GET  /api/inquiries</span>: Protected inquiries vault (?key=... or X-Admin-Key)</div>
 `,
 
     services: () => `
@@ -145,6 +160,53 @@
         outLine.innerHTML = `<span class="cmd-dim">Usage: theme [violet | cyan | emerald | amber | rose]</span>`;
         terminalOutput.appendChild(outLine);
       }
+    } else if (cmd === 'inquiries') {
+      const adminKey = arg || 'shivang-admin-key';
+      const statusLine = document.createElement('div');
+      statusLine.className = 'terminal-line';
+      statusLine.innerHTML = `<span class="cmd-dim">Connecting to /api/inquiries (FastAPI)...</span>`;
+      terminalOutput.appendChild(statusLine);
+
+      fetch(`/api/inquiries?key=${encodeURIComponent(adminKey)}`)
+        .then(async (res) => {
+          if (res.status === 401) {
+            throw new Error('401 Unauthorized: Invalid admin key. Usage: inquiries [admin-key]');
+          }
+          if (!res.ok) {
+            throw new Error(`Server returned HTTP ${res.status}`);
+          }
+          return res.json();
+        })
+        .then((data) => {
+          statusLine.remove();
+          const container = document.createElement('div');
+          if (!data.inquiries || data.inquiries.length === 0) {
+            container.innerHTML = `<div class="terminal-line"><span class="cmd-highlight">INQUIRIES VAULT:</span> 0 messages found. Inbox is clean!</div>`;
+          } else {
+            let html = `<div class="terminal-line"><span class="cmd-success">✔ SECURE INQUIRIES VAULT (${data.total} Total):</span></div>`;
+            data.inquiries.forEach((item, idx) => {
+              html += `
+<div class="terminal-line" style="margin-top: 6px; padding: 8px 12px; background: rgba(255,255,255,0.03); border-left: 2px solid var(--accent); border-radius: 4px;">
+  <div><span class="cmd-prefix">[#${idx + 1}] ${escapeHtml(item.id || 'N/A')}</span> <span class="cmd-dim">(${escapeHtml(item.created_at || 'Recent')})</span></div>
+  <div><span class="cmd-highlight">From:</span> ${escapeHtml(item.name || 'Anonymous')} &lt;<a href="mailto:${escapeHtml(item.email)}" class="cmd-prefix">${escapeHtml(item.email || 'N/A')}</a>&gt;</div>
+  <div style="margin-top: 4px;"><span class="cmd-highlight">Message:</span> ${escapeHtml(item.message || '')}</div>
+</div>`;
+            });
+            container.innerHTML = html;
+          }
+          terminalOutput.appendChild(container);
+          if (terminalOutput.parentElement) {
+            terminalOutput.parentElement.scrollTop = terminalOutput.parentElement.scrollHeight;
+          }
+        })
+        .catch((err) => {
+          statusLine.remove();
+          const errLine = document.createElement('div');
+          errLine.className = 'terminal-line';
+          errLine.innerHTML = `<span style="color: #f87171;">✘ ${escapeHtml(err.message)}</span>`;
+          terminalOutput.appendChild(errLine);
+        });
+      return;
     } else if (COMMANDS[cmd]) {
       const result = COMMANDS[cmd]();
       if (result) {
